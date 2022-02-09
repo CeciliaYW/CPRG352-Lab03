@@ -51,19 +51,29 @@ public class NoteServlet extends HttpServlet {
         BufferedReader br = new BufferedReader(new FileReader(new File(path)));
         
         String title = br.readLine();
-        String content = br.readLine();
+//        String content = br.readLine();
+        StringBuffer content = new StringBuffer(br.readLine());
         br.close();
         
         title = request.getParameter("edit_title");
-        content = request.getParameter("edit_contents");
+//        content = request.getParameter("edit_contents");
+        content = new StringBuffer(request.getParameter("edit_contents"));
         
+        int loc = (new String(content).indexOf('\n'));
+        while(loc > 0){
+            content.replace(loc, loc + 1, "<BR>");
+            loc = (new String(content).indexOf('\n'));
+        }
+        
+        String formattedContent = content.toString();
+
         PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(path, false))); 
         
         pw.println(title);
         pw.println(content);
         pw.close();
         
-        Note note = new Note(title, content);
+        Note note = new Note(title, formattedContent);
         request.setAttribute("note", note);
         
         getServletContext().getRequestDispatcher("/WEB-INF/viewnote.jsp").forward(request,response);
